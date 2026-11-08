@@ -1,0 +1,59 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
+
+using namespace std;
+
+int main() {
+    int n, m, k, l;
+    if (!(cin >> n >> m >> k >> l)) return 0;
+    
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v;
+        cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    
+    vector<int> dist(n + 1, -1);
+    vector<int> parent(n + 1, 0);
+    queue<int> q;
+    
+    q.push(k);
+    dist[k] = 0;
+    
+    while (!q.empty()) {
+        int curr = q.front();
+        q.pop();
+        
+        if (curr == l) break;
+        
+        for (int next_city : adj[curr]) {
+            if (dist[next_city] == -1) {
+                dist[next_city] = dist[curr] + 1;
+                parent[next_city] = curr;
+                q.push(next_city);
+            }
+        }
+    }
+    
+    if (dist[l] == -1) {
+        cout << "Маршрут відсутній\n";
+    } else {
+        int transfers = max(0, dist[l] - 1);
+        cout << "Пересадок: " << transfers << "\n";
+        
+        vector<int> path;
+        for (int v = l; v != 0; v = parent[v]) {
+            path.push_back(v);
+        }
+        reverse(path.begin(), path.end());
+        
+        cout << "Маршрут: ";
+        for (int v : path) cout << v << " ";
+        cout << "\n";
+    }
+    return 0;
+}
