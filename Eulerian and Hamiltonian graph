@@ -1,0 +1,67 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+const int INF = 1e9;
+int n, m;
+int graph[105][105];
+bool visited[105];
+int best_cost = INF;
+vector<int> best_path;
+vector<int> current_path;
+
+void dfs(int u, int current_cost, int count) {
+    current_path.push_back(u);
+    visited[u] = true;
+    
+    if (count == n) { 
+        if (current_cost < best_cost) {
+            best_cost = current_cost;
+            best_path = current_path;
+        }
+    } else {
+        for (int v = 1; v <= n; v++) {
+            if (graph[u][v] > 0 && !visited[v]) {
+                if (current_cost + graph[u][v] < best_cost) {
+                    dfs(v, current_cost + graph[u][v], count + 1);
+                }
+            }
+        }
+    }
+    
+    visited[u] = false;
+    current_path.pop_back();
+}
+
+int main() {
+    if (!(cin >> n >> m)) return 0;
+    
+    for (int i = 0; i <= n; i++)
+        for (int j = 0; j <= n; j++)
+            graph[i][j] = 0;
+            
+    for (int i = 0; i < m; i++) {
+        int u, v, k;
+        cin >> u >> v >> k;
+        if (graph[u][v] == 0 || k < graph[u][v]) {
+            graph[u][v] = k;
+            graph[v][u] = k; 
+        }
+    }
+    
+    for (int i = 1; i <= n; i++) {
+        dfs(i, 0, 1);
+    }
+    
+    if (best_cost == INF) {
+        cout << "Гамільтонів шлях відсутній\n";
+    } else {
+        cout << "Мінімальна кількість троянд: " << best_cost << "\n";
+        cout << "Маршрут: ";
+        for (int v : best_path) cout << v << " ";
+        cout << "\n";
+    }
+    return 0;
+}
